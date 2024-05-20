@@ -1,0 +1,211 @@
+/*********************************************************
+This project is made to procedurally draw books on a shelf
+**********************************************************/
+
+// list that contain the multiple shelves and their respective books
+var shelves = [];
+var shelvesAmount = 4;
+
+//create the shelves
+function generateShelf(y) {
+    var y = y;
+   // shelf object that will hold the books
+    var shelf = {
+        x: -25,
+        y: y,
+        w: 450,
+        h: 15,
+        numBooks: 15,
+        books: [],
+        
+        Draw: function() {
+            stroke(59, 28, 28);
+            fill(173, 117, 33);
+            rect(this.x, this.y + 4, this.w, this.h);
+            rect(this.x, this.y - 12, this.w, this.h);
+        }
+    };
+    
+    return shelf;
+}
+
+//function that creates the book objects
+function generateBook() {
+    
+    //defines font
+        var f;
+        f = floor(random(5));
+        
+        switch(f) {
+            case 0:
+                
+                f = "serif";
+                break;
+            case 1:
+                
+                f = "sans-serif";
+                break;
+            case 2:
+                
+                f = "cursive";
+                break;
+            case 3:
+                
+                f = "fantasy";
+                break;
+            case 4:
+                
+                f = "monospace";
+                break;
+            
+        }
+        
+    var wid = floor(random(30, 50));
+    var hei = floor(random(85, 110));
+    
+    //generic book object
+    var book = {
+        
+        //book properties
+        width: wid,
+        height: hei,
+        
+        rating: floor(random(5)),
+        
+        color: color(floor(random(255)), floor(random(255)), floor(random(255))),
+
+        title: {
+            name: "some book",
+            font: f,
+            size: floor(wid/4),
+            lead: floor(hei/4),
+            color: color(floor(random(255)), floor(random(255)), floor(random(255)))
+        },
+        
+        //draw the books on the shelves
+        Draw: function(x, y) {
+            var title = this.title;
+            var score = this.rating;
+            var color = this.color;
+            var width = this.width;
+            var height = this.height;
+            
+            //make text variables
+            var txt = {
+                x: x + width * 1/45,
+                y: y - height * 1.10
+            };
+            
+            //rating variables
+            var rating = {
+                x: x + width/8,
+                y: y - 5,
+                spc: width/10
+            };
+            
+            // coloring and drawing book
+            stroke(0, 0, 0);
+            strokeWeight(1.80);
+            fill(color);
+            rect(x, y, width, -height);
+            quad(x + width, y,
+                x + width, y - height,
+                x + width + 3, y - height - 1,
+                x + width + 3, y - 2);
+            noStroke();
+            fill(70, 71, 45);
+            quad(x - 1, y - height - 1,
+                x + 3, y - height - 2.50,
+                x + width + 3, y - height - 2,
+                x + width, y - height);
+            
+            //draw title
+            fill(title.color);
+            textAlign(CENTER, CENTER);
+            textLeading(title.lead * 4);
+            textFont(title.font, title.size);
+            
+            text(title.name, txt.x, txt.y, width, height);
+            
+            //check if rating is zero
+            if (score === 0) {
+                stroke(0, 0, 0);
+                strokeWeight(2);
+                
+                line(rating.x, rating.y,
+                    rating.spc + rating.x, rating.y - 5);
+                
+                line(rating.spc + rating.x - 5, rating.y - 5,
+                    rating.x + 5, rating.y);
+                
+                stroke(255, 0, 0);
+                strokeWeight(1);
+                
+                line(rating.x, rating.y,
+                    rating.spc + rating.x, rating.y - 5);
+                
+                line(rating.spc + rating.x - 5, rating.y - 5,
+                    rating.x + 5, rating.y);
+            }
+            
+            //draw score if possible
+            for (var i = 0; i < score; i++) {
+                stroke(0, 0, 0);
+                strokeWeight(3);
+                line(i * rating.spc + 2 + rating.x, rating.y,
+                    i * rating.spc + rating.x, rating.y - 5);
+                    
+                    
+                stroke(214, 208, 47);
+                strokeWeight(1);
+                line(i * rating.spc + 2 + rating.x, rating.y,
+                    i * rating.spc + rating.x, rating.y - 5);
+            }
+        }
+    };
+
+    return book;
+}
+
+//draw the books onscreen
+function drawBooks(shelf) {
+    
+    //variable for keeping the length of the last book
+    var lastWidth = -10;
+    
+    //place book objects inside shelf
+    for (var i = 0; i < shelf.numBooks; i++) {
+        
+        shelf.books[i] = generateBook();
+        
+        if (lastWidth + shelf.books[i].width >= 520) {
+            i = shelf.numBooks;
+            
+        } else {
+            
+            shelf.books[i].Draw(lastWidth * 1.033 , shelf.y);
+        
+            lastWidth += shelf.books[i].width;
+        }
+        
+        
+    }
+}
+
+//set all objects in place and invoke the proper functions
+function main() {
+    background(122, 113, 113);
+    
+    for (var i = 0; i < shelvesAmount; i++) {
+        shelves[i] = generateShelf(135 * i + 50);
+        shelves[i].Draw();
+        
+        drawBooks(shelves[i]);
+    }
+}
+
+
+main();
+
+
+
